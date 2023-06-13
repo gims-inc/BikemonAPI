@@ -1,0 +1,9 @@
+node_modules
+.env
+package-lock.json
+misc.txt
+redis-stable
+redis-stable.tar.gz
+base64.js
+upload.py
+gab-dp.png
