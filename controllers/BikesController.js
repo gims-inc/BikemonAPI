@@ -1,6 +1,8 @@
+/* eslint-disable radix */
 /* eslint-disable object-shorthand */
 /* eslint-disable no-unused-vars */
 import Bike from '../models/bikes';
+import paginate from '../utils/paginate';
 
 const mongoose = require('mongoose');
 
@@ -17,11 +19,19 @@ class BikeController {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    const bikes = Bike.find();
-    res.status(200).json({ items: bikes });
+
+    const items = await Bike.find();
+    const currentPage = parseInt(req.query.page) || 1;
+
+    const itemsPerPage = parseInt(req.query.itemsPerPage) || 10;
+
+    const paginatedItems = paginate(items, currentPage, itemsPerPage);
+
+    res.status(200).json({ bikes: paginatedItems });
+    // http://localhost:5000/api/v1/bikes/index?page=2&itemsPerPage=20
   }
 
-  static async newBike(req, res) { // paginate
+  static async newBike(req, res) {
     const user = await getUser(req);
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -67,16 +77,18 @@ class BikeController {
       return;
     }
     try {
-      const { id } = req.params;
-      const { plate } = req.params;
+      const { id } = req.body;
+      const { plate } = req.body;
+      const { userid } = req.body;
+      const { description } = req.body;
       const bike = await Bike.findOne({ _id: ObjectId(id), plate: plate });
       if (!bike) {
         res.status(404).json({ error: 'Record not found' });
       }
       // bike.plate = req.body.plate;
-      bike.userid = user._id;
-      bike.description = req.body.description;
-      bike.image = req.body.image;
+      bike.userid = userid; // if user id not in rider collection decline ToDo
+      bike.description = description;
+      // bike.image = req.body.image;
       await bike.save();
       res.json({ message: 'Record updated successfully' });
       transactionLogger.info(`Bike record updated by: ${user._id}`);

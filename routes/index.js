@@ -11,12 +11,15 @@ const express = require('express');
 
 const api = express.Router();
 
+const moment = require('moment');
 const { appLogger } = require('../utils/logger');
 
 // const { authenticate } = require('../controllers/AuthController');
 
 api.use((req, res, next) => {
-  console.log(`Time:${Date.now()} ${req.path} ${req.method}`); // debug+delete
+  const timestamp = Date.now();
+  const formattedDateTime = moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
+  console.log(`Time: ${formattedDateTime} ${req.path} ${req.method}`);
   appLogger.info(`${req.path} ${req.method}`);
   next();
 });
@@ -42,23 +45,29 @@ api.get('/users/me', UsersController.getMe);
 api.get('/riders/index', RidersController.index);
 
 /*= ================================================================= */
-api.get('/bikes/index', BikeController.index);
+api.get('/bikes/index', BikeController.index);// all bike records
 
-api.post('/bikes/create', BikeController.newBike);
+api.post('/bikes/create', BikeController.newBike);// create new record
 
-api.post('/bikes/update', BikeController.updateBike);
+api.put('/bikes/update', BikeController.updateBike);// update/edid given fields:
 
-api.post('/bikes/delete', BikeController.softDelete);
+api.post('/bikes/delete:id', BikeController.softDelete);// soft delete
 
-api.post('/bikes/addImage', BikeController.attatchImage);
-
-/*= ================================================================= */
-api.get('/repairs/index', RepairsController.getRepair);
-
-api.post('/repairs/create', RepairsController.scheduledRepair);
+api.post('/bikes/addImage:id', BikeController.attatchImage);// add bike an image url
 
 /*= ================================================================= */
-api.post('/files', UploadController.postUpload);
+api.get('/repairs/index', RepairsController.getRepairs);// all recorded rpairs
+
+api.post('/repairs/save', RepairsController.recordRepairs);// new/completed repairs
+
+api.post('/repairs/create', RepairsController.scheduledRepairs);// assign a repair date to bike
+
+api.post('/repairs/upcoming', RepairsController.upcomingRepairs);// upcoming bike repairs
+
+api.post('/repairs/todays', RepairsController.todaysRepairs);//  current day repairs
+
+/*= ================================================================= */
+api.post('/files/upload', UploadController.postUpload);
 
 /*= ================================================================= */
 
