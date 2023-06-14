@@ -68,6 +68,19 @@ class AuthController {
       res.status(401).json({ error: 'Unauthorized' });
     }
   }
+
+  static async authenticate(req, res, next) {
+    // Check if the user is authenticated
+    const user = await User.getUser(req, res);
+    if (user) {
+      // User is authenticated, proceed to the next middleware or route handler
+      next();
+    } else {
+      // User is not authenticated, return an error response
+      res.status(401).json({ error: 'Unauthorized' });
+    }
+    return null;
+  }
 }
 
 module.exports = AuthController;

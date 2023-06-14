@@ -19,6 +19,7 @@ class DBClient {
     mongoose.connect(`${dbURL(HOST, PORT)}/${DBNAME || 'bikemon'}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
     });
 
     const { connection } = mongoose;
@@ -34,28 +35,6 @@ class DBClient {
 
   isAlive() {
     return this.connected;
-  }
-
-  async nbUsers() {
-    const usersCollection = this.db.collection('users');
-    try {
-      const count = await usersCollection.countDocuments();
-      return count;
-    } catch (error) {
-      console.error(error);
-      return -1;
-    }
-  }
-
-  async nbFiles() {
-    const filesCollection = this.db.collection('files');
-    try {
-      const count = await filesCollection.countDocuments();
-      return count;
-    } catch (error) {
-      console.error(error);
-      return -1;
-    }
   }
 }
 

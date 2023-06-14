@@ -25,6 +25,10 @@ const FileSchema = new mongoose.Schema({
   localpath: {
     type: String,
   },
+  isDelete: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

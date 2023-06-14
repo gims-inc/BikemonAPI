@@ -27,6 +27,10 @@ const UserSchema = new mongoose.Schema({
   designation: {
     type: String,
   },
+  isDelete: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

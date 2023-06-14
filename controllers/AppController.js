@@ -11,9 +11,24 @@ class AppController {
   }
 
   static getStats(req, res) {
-    Promise.all([ModelCounter.nbUsers(), ModelCounter.nbFiles()])
-      .then(([usersCount, filesCount]) => {
-        res.status(200).json({ users: usersCount, files: filesCount });
+    Promise.all([
+      ModelCounter.nbUsers(),
+      ModelCounter.nbFiles(),
+      ModelCounter.nbBikes(),
+      ModelCounter.nbTrackers(),
+    ])
+      .then(([
+        usersCount,
+        filesCount,
+        bikeCount,
+        trackerCount,
+      ]) => {
+        res.status(200).json({
+          users: usersCount,
+          files: filesCount,
+          bikes: bikeCount,
+          trackers: trackerCount,
+        });
       });
   }
 }

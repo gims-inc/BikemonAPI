@@ -13,6 +13,10 @@ const TrackerSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  isDelete: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
