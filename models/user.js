@@ -26,6 +26,8 @@ const UserSchema = new mongoose.Schema({
   },
   designation: {
     type: String,
+    enum: ['rider', 'admin', 'techadmin'],
+    default: 'rider',
   },
   isDelete: {
     type: Boolean,

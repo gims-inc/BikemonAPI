@@ -2,7 +2,10 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable no-unused-vars */
 import Bike from '../models/bikes';
+import User from '../models/user';
 import paginate from '../utils/paginate';
+import transformInput from '../utils/cleanNumberPlate';
+// import String from '../utils/strformat';
 
 const mongoose = require('mongoose');
 
@@ -13,7 +16,7 @@ const { transactionLogger } = require('../utils/logger');
 //  const { authenticate } = require('./AuthController');
 
 class BikeController {
-  static async index(req, res) { // paginate
+  static async index(req, res) { // paginate -> ToTest
     const user = await getUser(req);
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
@@ -31,6 +34,28 @@ class BikeController {
     // http://localhost:5000/api/v1/bikes/index?page=2&itemsPerPage=20
   }
 
+  static async search(req, res) {
+    const user = await getUser(req);
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+    }
+    const data = req.query.plate_no;
+    const clean = transformInput(data);
+    console.log(`Search: ${clean}`);
+    try {
+      const bike = await Bike.find({
+        plate: clean,
+      }); // 'repairs.scheduledrepair': { $eq: clean },
+      if (!bike) {
+        res.status(404).json({ error: 'Record not found' });
+      }
+      res.status(200).json({ bike: bike });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  }
+
   static async newBike(req, res) {
     const user = await getUser(req);
     if (!user) {
@@ -39,7 +64,7 @@ class BikeController {
     }
 
     const {
-      plate, trackerid, repairs, description, image,
+      plate, trackerid, riderid, repairs, description, image,
     } = req.body;
 
     await Bike.findOne({ plate: plate }, (err, doc) => {
@@ -48,10 +73,12 @@ class BikeController {
       } else {
         try {
           const newBike = new Bike({
-            plate, // toLowerCase().replace(/\s/g, '');
-            userid: user._id,
-            description,
-            image,
+            plate: plate,
+            trackerid: trackerid || null,
+            userid: riderid || null,
+            description: description,
+            repairs: repairs || null,
+            image: image || null,
           });
           newBike.save((err, result) => {
             res.status(201).json({ id: result.id });
@@ -72,10 +99,6 @@ class BikeController {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
-    if (user.designation === 'rider') {
-      res.status(400).json({ error: 'Not allowed' });
-      return;
-    }
     try {
       const { id } = req.body;
       const { plate } = req.body;
@@ -86,7 +109,11 @@ class BikeController {
         res.status(404).json({ error: 'Record not found' });
       }
       // bike.plate = req.body.plate;
-      bike.userid = userid; // if user id not in rider collection decline ToDo
+      const rider = User.findById(userid);
+      if (rider.designation === 'rider') { // debug
+        res.status(404).json({ error: 'Record for rider not found' });
+      }
+      bike.userid = rider; // if user id not in rider collection decline ToDo
       bike.description = description;
       // bike.image = req.body.image;
       await bike.save();
@@ -128,7 +155,7 @@ class BikeController {
     }
     try {
       const bikeId = req.params.id;
-      const bikeImage = req.params.image;
+      const bikeImage = req.params.image; // string: link/path to image
       const bike = await Bike.findById(bikeId);
       if (!bike) {
         res.status(404).json({ error: 'Record not found' });

@@ -7,9 +7,9 @@ import User from '../models/user';
 const { usersLogger } = require('../utils/logger');
 
 class AuthController {
-  static async getBasicTkn(req, res) { // upgrade to jwt later-
-    const useremail = req.body ? req.body.email : null;
-    const password = req.body ? req.body.password : null;
+  static async getBasicTkn(req, res) {
+    const useremail = req.body.email;
+    const { password } = req.body;
     if (!useremail) {
       res.status(400).json({ error: 'Missing email' });
       return;
@@ -18,16 +18,21 @@ class AuthController {
       res.status(400).json({ error: 'Missing password' });
       return;
     }
-
-    await User.findOne({ email: useremail }, (err, doc) => {
-      if (doc.password === sha1(password)) {
+    const hashpwd = sha1(password);
+    console.log(hashpwd);
+    try {
+      const doc = await User.findOne({ email: useremail });
+      if (doc && doc.password === hashpwd) {
         const encodedString = Buffer.from(`${useremail}:${password}`).toString('base64');
         res.status(200).json(`Basic ${encodedString}`);
         usersLogger.info(`user:${doc._id} authenticated`);
       } else {
-        res.status(400).json({ error: 'Invalid username or password!' });
+        res.status(400).json({ error: 'Invalid email or password!' });
       }
-    });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 
   static async getConnect(req, res) {

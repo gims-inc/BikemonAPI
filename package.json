@@ -25,6 +25,7 @@
     "mongoose": "^5.9.19",
     "redis": "^2.8.0",
     "sha1": "^1.1.1",
+    "sinon-chai": "^3.7.0",
     "uuid": "^8.2.0",
     "winston": "^3.9.0",
     "winston-mongodb": "^5.1.1"

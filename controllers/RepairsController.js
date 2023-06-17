@@ -5,7 +5,7 @@ import Bike from '../models/bikes';
 import Repair from '../models/repairs';
 import paginate from '../utils/paginate';
 
-const mongoose = require('mongoose');
+const mongoose = require('mongoose').set('debug', true);
 
 const moment = require('moment');
 
@@ -44,21 +44,70 @@ class RepairsController {
       return;
     }
     try {
-      const bikeId = req.params.id;
-      const nextRepair = req.params.setrepair;
-      const bike = await Bike.findById(bikeId);
-      if (!bike) {
-        res.status(404).json({ error: 'Record not found' });
-      }
+      const bikeId = req.query.id;
+      // console.log(`param ->bike: ${bikeId}`); // debug null y!?
+      const nextRepair = req.query.set_repair_date;
+      // const bike = Bike.findById(bikeId);
+      // console.log(`findById ->bike: ${bike}`); // debug
+      // if (!bike) {
+      //   // errors.bike = '';
+      //   res.status(404).json({ error: 'Record not found' });
+      //   return;
+      // }
       const newDate = moment(nextRepair, 'YYYY-MM-DD');
+      console.log(`new date: ${newDate}`); // debug
       if (!newDate.isValid()) {
         res.status(400).json({ error: 'Invalid date format' });
         return;
       }
-      bike.repairs.scheduledrepair = newDate.format('YYYY-MM-DD'); // ToTest
-      bike.repairs.previousrepair = bike.repairs.scheduledrepair;
-      await bike.save();
-      res.json({ message: 'Record updated successfully' });
+      // bike.scheduledrepair = newDate.format('YYYY-MM-DD'); // buggy
+      // bike.previousrepair = bike.scheduledrepair || null;
+
+      // bike.repairs = {
+      //   scheduledrepair: newDate.format('YYYY-MM-DD'),
+      //   previousrepair: bike.repairs.scheduledrepair || '',
+      // };
+
+      // bike.repairs = bike.repairs || {}; // Initialize repairs object if it's undefined
+      // bike.repairs.scheduledrepair = newDate.format('YYYY-MM-DD');
+      // bike.repairs.previousrepair = bike.repairs.scheduledrepair || '';
+
+      // const updatedBike = await Bike.findOneAndUpdate(
+      //   { _id: ObjectId(bikeId) },
+      //   {
+      //     $set: {
+      //       'repairs.scheduledrepair': newDate.format('YYYY-MM-DD'),
+      //       'repairs.previousrepair': 'repairs.scheduledrepair' || newDate.format('YYYY-MM-DD'),
+      //     },
+      //   },
+      //   { new: true },
+      // );
+
+      // if (!updatedBike) {
+      //   res.status(404).json({ error: 'Record not found' });
+      //   return;
+      // }
+
+      Bike.findByIdAndUpdate(bikeId,
+        {
+          $set:
+          {
+            scheduledrepair: newDate.format('YYYY-MM-DD'),
+            previousrepair: '' || newDate.format('YYYY-MM-DD'),
+          },
+        },
+        (err, doc) => {
+          // console.log(doc);
+          if (err) {
+            res.status(404).json({ error: 'Record not found' });
+          } else {
+            res.status(200).json({ message: `Bike scheduled for repair on, date: ${doc.scheduledrepair}` });
+            transactionLogger.info(`Upcoming repair updated: ${doc._id}, date: ${doc.scheduledrepair}`);
+          }
+        });
+
+      // await bike.save();
+      // res.json({ message: 'Record updated successfully' });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -71,7 +120,7 @@ class RepairsController {
       res.status(401).json({ error: 'Unauthorized' });
     }
     try {
-      const today = moment().format('YYYY-MM-DD'); // Get today's date in 'YYYY-MM-DD' format
+      const today = moment().format('YYYY-MM-DD');
 
       const bikes = await Bike.find({
         'repairs.scheduledrepair': { $gt: today },

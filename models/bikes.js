@@ -11,13 +11,11 @@ const BikeSchema = new mongoose.Schema({
   trackerid: {
     type: String,
   },
-  repairs: {
-    scheduledrepair: {
-      type: String,
-    },
-    previousrepair: {
-      type: String,
-    },
+  scheduledrepair: {
+    type: String,
+  },
+  previousrepair: {
+    type: String,
   },
   description: {
     type: String,
