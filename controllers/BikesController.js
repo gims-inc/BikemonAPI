@@ -82,11 +82,17 @@ class BikeController {
           });
           newBike.save((err, result) => {
             res.status(201).json({ id: result.id });
-            transactionLogger.info(`New Bike: ${result.id}`);
+
+            const additionalData = {
+              user: user._id,
+              requestId: result.id,
+            };
+
+            transactionLogger.info(`New Bike: ${plate}`, { meta: additionalData });
           });
         } catch (error) {
           console.log(error);
-          transactionLogger.error(`Bike record creation failed: ${error}`);
+          transactionLogger.error('Bike record creation failed', { meta: error });
         }
       }
     });
@@ -118,11 +124,15 @@ class BikeController {
       // bike.image = req.body.image;
       await bike.save();
       res.json({ message: 'Record updated successfully' });
-      transactionLogger.info(`Bike record updated by: ${user._id}`);
+      const additionalData = {
+        user: user._id,
+        bikeId: bike._id,
+      };
+      transactionLogger.info(`Bike record updated by: ${user.username}`, { meta: additionalData });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
-      transactionLogger.error(`Record update failed: ${error}`);
+      transactionLogger.error('Record update failed', { meta: error });
     }
   }
 
@@ -162,7 +172,7 @@ class BikeController {
       }
       bike.image = bikeImage;
       await bike.save();
-      res.json({ message: 'Record updated successfully' });
+      res.json({ message: 'Record updated successfully' }); // add logger
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });

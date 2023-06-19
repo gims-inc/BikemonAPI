@@ -19,7 +19,7 @@ class AuthController {
       return;
     }
     const hashpwd = sha1(password);
-    console.log(hashpwd);
+    // console.log(hashpwd);
     try {
       const doc = await User.findOne({ email: useremail });
       if (doc && doc.password === hashpwd) {

@@ -69,14 +69,16 @@ api.post('/repairs/save', RepairsController.recordRepairs);// new/completed repa
 
 api.get('/repairs/create', RepairsController.scheduledRepairs);// assign a repair date to a bike
 
-api.post('/repairs/upcoming', RepairsController.upcomingRepairs);// upcoming bike repairs
+api.get('/repairs/upcoming', RepairsController.upcomingRepairs);// upcoming bike repairs
 
-api.post('/repairs/todays', RepairsController.todaysRepairs);//  current day repairs
+api.get('/repairs/todays', RepairsController.todaysRepairs);//  current day repairs
 
 /*= ================================================================= */
 api.get('/payments/index', PaymentsController.index);// all recorded payments
 
 api.post('/payments/save', PaymentsController.recordPayment);// new payment record.
+
+api.get('/payments/stats', PaymentsController.totalPayments); // total daily/weekly/monthly
 
 /*= ================================================================= */
 api.post('/files/upload', UploadController.postUpload);

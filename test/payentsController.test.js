@@ -4,7 +4,7 @@
 const chai = require('chai');
 const sinon = require('sinon');
 const sinonChai = require('sinon-chai');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
 const { expect } = chai;
 chai.use(sinonChai);

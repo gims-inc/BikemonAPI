@@ -1,14 +1,20 @@
+/* eslint-disable object-shorthand */
 /* eslint-disable radix */
 /* eslint-disable no-unused-vars */
 import Payments from '../models/payments';
+import Bikes from '../models/bikes';
+import transformInput from '../utils/cleanNumberPlate';
+import paginate from '../utils/paginate';
+
+const moment = require('moment');
+const { getDailyPaymentsTotal, getWeeklyPaymentsTotal, getMonthlyPaymentsTotal } = require('../utils/paymentsAggregater');
 
 const { getUser } = require('./UsersController');
-const { paginate } = require('../utils/paginate');
 const { transactionLogger } = require('../utils/logger');
 
 class PaymentsController {
   static async index(req, res) {
-    const user = await getUser(req);
+    const user = await getUser(req); // uncoment
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
     }
@@ -29,27 +35,102 @@ class PaymentsController {
   }
 
   static async recordPayment(req, res) {
+    const user = await getUser(req); // uncomment
+    if (!user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { bikeNum, date, data } = req.body;
+
+    const clean = transformInput(bikeNum);
+    console.log(`Search: ${clean}`);
+
+    const bike = await Bikes.find({
+      plate: clean,
+    }); // find by plate reeturn id
+    if (!bike) {
+      res.status(401).json({ error: 'Check the bike plate number and try again!' });
+      return;
+    }
+    // const bikeid = bike;
+    const newDate = moment(date, 'YYYY-MM-DD');
+    console.log(`new date: ${newDate}`); // debug
+    if (!newDate.isValid()) {
+      res.status(400).json({ error: 'Invalid date format' });
+      return;
+    }
+
+    try {
+      const payment = new Payments({
+        bikeid: bike._id,
+        date: newDate,
+        paidby: data.paidby,
+        mode: data.mode,
+        amount: data.amount,
+        transactid: data.transactid,
+      });
+      console.log(`payment data:${payment}`); // debug
+      payment.save((err, result) => {
+        res.status(201).json({ plate: bikeNum, amount: result.amount });
+
+        const additionalData = {
+          user: data.paidBy, // undo
+          data: result.id,
+        };
+
+        transactionLogger.info(`New payment record: ${clean}`, { meta: additionalData });
+      });
+    } catch (error) {
+      console.log(error);
+      transactionLogger.error('payment record creation failed', { meta: error });
+    }
+  }
+
+  // static async totalPayments(req, res) {
+  //   try {
+  //     const dailyTotal = await getDailyPaymentsTotal();
+  //     const weeklyTotal = await getWeeklyPaymentsTotal();
+  //     const monthlyTotal = await getMonthlyPaymentsTotal();
+  //     const totals = {};
+  //     totals.daily = Number(dailyTotal);
+  //     totals.weekly = Number(weeklyTotal);
+  //     totals.monthly = Number(monthlyTotal);
+
+  //     // Sending the totals as a response
+  //     return res.status(200).json({ totals });
+  //   } catch (error) {
+  //     // Handle any errors that occurred during the calculation or response
+  //     return res.status(500).json({ error: 'An error occurred' });
+  //   }
+  // }
+
+  static async totalPayments(req, res) {
     const user = await getUser(req);
     if (!user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
-    const { bikeid, date, data } = req.body;
-
     try {
-      const payment = new Payments({
-        bikeid,
-        date,
-        data,
-      });
-      payment.save((err, result) => {
-        res.status(201).json({ id: result.id });
-        transactionLogger.info(`New payment record: ${result.id}`);
-      });
+      const [dailyTotal, weeklyTotal, monthlyTotal] = await Promise.all([
+        getDailyPaymentsTotal(),
+        getWeeklyPaymentsTotal(),
+        getMonthlyPaymentsTotal(),
+      ]);
+
+      const totals = {
+        daily: Number(dailyTotal),
+        weekly: Number(weeklyTotal),
+        monthly: Number(monthlyTotal),
+      };
+
+      // Sending the totals as a response
+      Promise.resolve(res.status(200).json(totals));
     } catch (error) {
-      console.log(error);
-      transactionLogger.error(`payment record creation failed: ${error}`);
+      // Handle any errors that occurred during the calculation or response
+      console.log(`total payments error ${error}`);
+      Promise.resolve(res.status(500).json({ error: 'An error occurred' }));
     }
   }
 }

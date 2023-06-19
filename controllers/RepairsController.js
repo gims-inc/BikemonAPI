@@ -47,7 +47,7 @@ class RepairsController {
       const bikeId = req.query.id;
       // console.log(`param ->bike: ${bikeId}`); // debug null y!?
       const nextRepair = req.query.set_repair_date;
-      // const bike = Bike.findById(bikeId);
+      // const bike = Bike.findById({ _id: bikeId });
       // console.log(`findById ->bike: ${bike}`); // debug
       // if (!bike) {
       //   // errors.bike = '';
@@ -56,10 +56,17 @@ class RepairsController {
       // }
       const newDate = moment(nextRepair, 'YYYY-MM-DD');
       console.log(`new date: ${newDate}`); // debug
-      if (!newDate.isValid()) {
+      if (!newDate.isValid() || newDate.isBefore()) {
         res.status(400).json({ error: 'Invalid date format' });
         return;
       }
+
+      // const newPreviousDate = bike.scheduledrepair.format('YYYY-MM-DD') || '';
+      // console.log(`old repair date: ${bike.scheduledrepair}`); // debug
+      // if (newDate === newPreviousDate) {
+      //   res.status(400).json({ error: 'Schedule already made!' });
+      //   return;
+      // }
       // bike.scheduledrepair = newDate.format('YYYY-MM-DD'); // buggy
       // bike.previousrepair = bike.scheduledrepair || null;
 
@@ -93,7 +100,7 @@ class RepairsController {
           $set:
           {
             scheduledrepair: newDate.format('YYYY-MM-DD'),
-            previousrepair: '' || newDate.format('YYYY-MM-DD'),
+            // previousrepair: '' || newDate.format('YYYY-MM-DD'),
           },
         },
         (err, doc) => {
@@ -101,8 +108,9 @@ class RepairsController {
           if (err) {
             res.status(404).json({ error: 'Record not found' });
           } else {
-            res.status(200).json({ message: `Bike scheduled for repair on, date: ${doc.scheduledrepair}` });
-            transactionLogger.info(`Upcoming repair updated: ${doc._id}, date: ${doc.scheduledrepair}`);
+            res.status(200).json({ message: `Bike scheduled for repair on: ${doc.scheduledrepair}` });
+            // reconstruct logger string+meta Todo
+            transactionLogger.info(`Upcoming repair updated: ${doc._id}, date: ${doc.scheduledrepair}`, { meta: bikeId });
           }
         });
 
@@ -123,12 +131,12 @@ class RepairsController {
       const today = moment().format('YYYY-MM-DD');
 
       const bikes = await Bike.find({
-        'repairs.scheduledrepair': { $gt: today },
+        scheduledrepair: { $gt: today },
       });
       if (!bikes) {
         res.status(404).json({ error: 'Records not found' });
       }
-      res.status(200).json({ shecduled: bikes });
+      res.status(200).json({ shecduled: bikes }); // paginate
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -144,12 +152,12 @@ class RepairsController {
       // Get today's date in 'YYYY-MM-DD' format
       const today = moment().format('YYYY-MM-DD');
       const bikes = await Bike.find({
-        'repairs.scheduledrepair': { $eq: today },
+        scheduledrepair: { $eq: today },
       });
       if (!bikes) {
         res.status(404).json({ error: 'Records not found' });
       }
-      res.status(200).json({ shecduled: bikes });
+      res.status(200).json({ shecduled: bikes }); // paginate
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });
@@ -170,7 +178,7 @@ class RepairsController {
       });
       repairRecord.save((err, result) => {
         res.status(201).json({ id: result.id });
-        transactionLogger.info(`New Repair Record: ${result.id}`);
+        transactionLogger.info(`New Repair Record: ${result.id}`); // meta
       });
     } catch (error) {
       console.error(error);

@@ -14,6 +14,18 @@ class ModelCounter {
     }
   }
 
+  static async nbRiders() {
+    try {
+      const property = 'designation';
+      const query = { [property]: { $exists: true } };
+      const count = await User.countDocuments(query);
+      return count;
+    } catch (error) {
+      console.error(error);
+      return -1;
+    }
+  }
+
   static async nbFiles() {
     try {
       const count = File.countDocuments();
