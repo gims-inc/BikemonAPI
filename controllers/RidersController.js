@@ -66,8 +66,13 @@ class RidersController {
       return;
     }
 
-    const bikeId = req.query.bike_id;
-    const userid = req.query.user_id;
+    const bikeId = req.query.val_one;
+    const userid = req.query.val_two;
+
+    if (!bikeId || !userid) {
+      res.status(400).json({ error: 'Missing required parameters' });
+      return;
+    }
 
     try {
       const bike = await Bike.findById(bikeId);
@@ -93,8 +98,8 @@ class RidersController {
       bike.userid = userid;
       await bike.save();
 
-      res.status(200).json({ message: `Bike assigned successfully to: ${userid}` });
-      transactionLogger.info(`Bike asinged to riderId: ${userid}`);
+      res.status(200).json({ message: `Bike ${bike.plate} assigned successfully to: ${userid}` });
+      transactionLogger.info(`Bike ${bike.plate} asinged to riderId: ${userid}`, { meta: userid });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });

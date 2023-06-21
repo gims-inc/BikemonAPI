@@ -14,6 +14,7 @@ const FileSchema = new mongoose.Schema({
   },
   parentid: {
     type: String,
+    default: '0',
   },
   public: {
     type: Boolean,

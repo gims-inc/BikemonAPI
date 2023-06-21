@@ -73,7 +73,7 @@ class BikeController {
       } else {
         try {
           const newBike = new Bike({
-            plate: plate,
+            plate: transformInput(plate),
             trackerid: trackerid || null,
             userid: riderid || null,
             description: description,
@@ -81,7 +81,7 @@ class BikeController {
             image: image || null,
           });
           newBike.save((err, result) => {
-            res.status(201).json({ id: result.id });
+            res.status(201).json({ id: result.id, no: result.plate });
 
             const additionalData = {
               user: user._id,

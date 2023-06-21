@@ -6,7 +6,6 @@ import BikeController from '../controllers/BikesController';
 import RepairsController from '../controllers/RepairsController';
 import RidersController from '../controllers/RidersController';
 import PaymentsController from '../controllers/PaymentsController';
-// import Auth from '../middleware/auth';
 
 const express = require('express');
 
@@ -15,7 +14,7 @@ const api = express.Router();
 const moment = require('moment');
 const { appLogger } = require('../utils/logger');
 
-// const { authenticate } = require('../controllers/AuthController');
+const { auth } = require('../middleware/auth');
 
 api.use((req, res, next) => {
   const timestamp = Date.now();
@@ -78,7 +77,7 @@ api.get('/payments/index', PaymentsController.index);// all recorded payments
 
 api.post('/payments/save', PaymentsController.recordPayment);// new payment record.
 
-api.get('/payments/stats', PaymentsController.totalPayments); // total daily/weekly/monthly
+api.get('/payments/stats', auth, PaymentsController.totalPayments); // total daily/weekly/monthly
 
 /*= ================================================================= */
 api.post('/files/upload', UploadController.postUpload);

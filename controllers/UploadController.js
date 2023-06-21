@@ -5,9 +5,9 @@ import Queue from 'bull';
 import UsersController from './UsersController';
 import File from '../models/files';
 
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 
-const { ObjectId } = mongoose.Types;
+// const { ObjectId } = mongoose.Types;
 
 const redisHost = process.env.REDIS_HOST || '127.0.0.1';
 const redisPort = process.env.REDIS_PORT || 6379;
@@ -37,8 +37,8 @@ class UploadController {
       return res.status(400).json({ error: 'Missing data' });
     }
     if (parentId) {
-      const idObject = ObjectId(parentId);
-      const file = await File.findOne({ _id: idObject, userid: user._id }); //  here
+      // const idObject = ObjectId(parentId);
+      const file = await File.findOne({ _id: parentId, userid: user._id }); //  here
       if (!file) {
         console.log(`parentId:${parentId}`); // debug
         return res.status(400).json({ error: 'Parent not found' });

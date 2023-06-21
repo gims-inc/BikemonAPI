@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 /* eslint-disable object-shorthand */
 /* eslint-disable radix */
 /* eslint-disable no-unused-vars */
@@ -46,9 +47,10 @@ class PaymentsController {
     const clean = transformInput(bikeNum);
     console.log(`Search: ${clean}`);
 
-    const bike = await Bikes.find({
+    const bike = await Bikes.findOne({
       plate: clean,
     }); // find by plate reeturn id
+
     if (!bike) {
       res.status(401).json({ error: 'Check the bike plate number and try again!' });
       return;
@@ -105,12 +107,14 @@ class PaymentsController {
   //   }
   // }
 
-  static async totalPayments(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
+  static async totalPayments(req, res) { // auth v1.1
+    // const user = await getUser(req); // uncoment
+    // if (!user) {
+    //   res.status(401).json({ error: 'Unauthorized' });
+    //   return;
+    // }
+
+    // console.log(`Access the user from middleware request object: ${req.userId}`);
 
     try {
       const [dailyTotal, weeklyTotal, monthlyTotal] = await Promise.all([

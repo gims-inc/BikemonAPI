@@ -57,7 +57,7 @@ class RepairsController {
       const newDate = moment(nextRepair, 'YYYY-MM-DD');
       console.log(`new date: ${newDate}`); // debug
       if (!newDate.isValid() || newDate.isBefore()) {
-        res.status(400).json({ error: 'Invalid date format' });
+        res.status(400).json({ error: 'Invalid date format or date is less than today!' });
         return;
       }
 
