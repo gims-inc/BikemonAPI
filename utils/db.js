@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 // const dotenv = require('dotenv');
 
 class DBClient {
@@ -8,7 +9,7 @@ class DBClient {
     const PORT = parseInt(process.env.DB_PORT);
     const DBNAME = process.env.DB_DATABASE;
 
-    function dbURL(host = 'localhost', port = 27017) {
+    function dbURL(host = HOST, port = PORT) {
       const urlStr = `mongodb://${host}:${port}`;
       return urlStr;
     }
@@ -16,7 +17,7 @@ class DBClient {
     this.connected = false;
     this.db = null;
 
-    mongoose.connect(`${dbURL(HOST, PORT)}/${DBNAME || 'bikemon'}`, {
+    mongoose.connect(`${dbURL(HOST, PORT)}/${DBNAME}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,

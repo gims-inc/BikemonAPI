@@ -4,13 +4,10 @@ import { promises as fs } from 'fs';
 import Queue from 'bull';
 import UsersController from './UsersController';
 import File from '../models/files';
+require('dotenv').config();
 
-// const mongoose = require('mongoose');
-
-// const { ObjectId } = mongoose.Types;
-
-const redisHost = process.env.REDIS_HOST || '127.0.0.1';
-const redisPort = process.env.REDIS_PORT || 6379;
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
 
 const fileQueue = new Queue('fileQueue', { redis: { port: redisPort, host: redisHost } });
 

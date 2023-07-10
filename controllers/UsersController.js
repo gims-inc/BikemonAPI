@@ -2,6 +2,7 @@
 import sha1 from 'sha1';
 import redisClient from '../utils/redis';
 import User from '../models/user';
+require('dotenv').config();
 
 const mongoose = require('mongoose');
 
@@ -11,8 +12,8 @@ const Queue = require('bull');
 
 const { usersLogger, transactionLogger } = require('../utils/logger');
 
-const redisHost = process.env.REDIS_HOST || '127.0.0.1';
-const redisPort = process.env.REDIS_PORT || 6379;
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
 
 const userQueue = new Queue('userQueue', { redis: { port: redisPort, host: redisHost } });
 
