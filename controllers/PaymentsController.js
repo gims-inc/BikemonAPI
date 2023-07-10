@@ -10,15 +10,11 @@ import paginate from '../utils/paginate';
 const moment = require('moment');
 const { getDailyPaymentsTotal, getWeeklyPaymentsTotal, getMonthlyPaymentsTotal } = require('../utils/paymentsAggregater');
 
-const { getUser } = require('./UsersController');
+// const { getUser } = require('./UsersController');
 const { transactionLogger } = require('../utils/logger');
 
 class PaymentsController {
   static async index(req, res) {
-    const user = await getUser(req); // uncoment
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
     try {
       const items = await Payments.find();
 
@@ -36,12 +32,6 @@ class PaymentsController {
   }
 
   static async recordPayment(req, res) {
-    const user = await getUser(req); // uncomment
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
     const { bikeNum, date, data } = req.body;
 
     const clean = transformInput(bikeNum);
@@ -108,12 +98,6 @@ class PaymentsController {
   // }
 
   static async totalPayments(req, res) { // auth v1.1
-    // const user = await getUser(req); // uncoment
-    // if (!user) {
-    //   res.status(401).json({ error: 'Unauthorized' });
-    //   return;
-    // }
-
     // console.log(`Access the user from middleware request object: ${req.userId}`);
 
     try {

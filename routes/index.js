@@ -73,9 +73,9 @@ api.get('/repairs/upcoming', RepairsController.upcomingRepairs);// upcoming bike
 api.get('/repairs/todays', RepairsController.todaysRepairs);//  current day repairs
 
 /*= ================================================================= */
-api.get('/payments/index', PaymentsController.index);// all recorded payments
+api.get('/payments/index', auth, PaymentsController.index);// all recorded payments
 
-api.post('/payments/save', PaymentsController.recordPayment);// new payment record.
+api.post('/payments/save', auth, PaymentsController.recordPayment);// new payment record.
 
 api.get('/payments/stats', auth, PaymentsController.totalPayments); // total daily/weekly/monthly
 

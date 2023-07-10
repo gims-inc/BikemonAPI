@@ -81,7 +81,11 @@ class BikeController {
             image: image || null,
           });
           newBike.save((err, result) => {
-            res.status(201).json({ id: result.id, no: result.plate });
+            if (err) {
+              res.status(400).json({ error: 'failed' });
+            }
+
+            res.status(201).json({ id: result._id, no: result.plate });
 
             const additionalData = {
               user: user._id,

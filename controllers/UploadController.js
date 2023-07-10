@@ -54,7 +54,7 @@ class UploadController {
           userid: user._id,
           name: name,
           type: type,
-          parentid: parentId || 0,
+          parentid: parentId, // debug
           public: isPublic,
         }, (err, result) => {
           if (result) {
