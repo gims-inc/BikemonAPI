@@ -42,35 +42,35 @@ api.post('/users', UsersController.newUser);
 api.get('/users/me', UsersController.getMe);
 
 /*= ================================================================= */
-api.get('/riders/index', RidersController.index); // list of riders
+api.get('/riders/index', auth, RidersController.index); // list of riders
 
-api.get('/riders/find/:id', RidersController.findbyId); // rider
+api.get('/riders/find/:id', auth, RidersController.findbyId); // rider
 
-api.post('/riders/assign_bike', RidersController.assignBike); // attatch bike to a rider
-
-/*= ================================================================= */
-api.get('/bikes/index', BikeController.index);// list of all bike records
-
-api.get('/bikes/search', BikeController.search);// search for a bike
-
-api.post('/bikes/create', BikeController.newBike);// create new record
-
-api.put('/bikes/update', BikeController.updateBike);// update/edid given fields:
-
-api.post('/bikes/delete/:id', BikeController.softDelete);// soft delete
-
-api.post('/bikes/addImage/:id', BikeController.attatchImage);// add bike an image url
+api.post('/riders/assign_bike', auth, RidersController.assignBike); // attatch bike to a rider
 
 /*= ================================================================= */
-api.get('/repairs/index', RepairsController.getRepairs);// all recorded rpairs
+api.get('/bikes/index', auth, BikeController.index);// list of all bike records
 
-api.post('/repairs/save', RepairsController.recordRepairs);// new/completed repairs
+api.get('/bikes/search', auth, BikeController.search);// search for a bike
 
-api.get('/repairs/create', RepairsController.scheduledRepairs);// assign a repair date to a bike
+api.post('/bikes/create', auth, BikeController.newBike);// create new record
 
-api.get('/repairs/upcoming', RepairsController.upcomingRepairs);// upcoming bike repairs
+api.put('/bikes/update', auth, BikeController.updateBike);// update/edid given fields:
 
-api.get('/repairs/todays', RepairsController.todaysRepairs);//  current day repairs
+api.post('/bikes/delete/:id', auth, BikeController.softDelete);// soft delete
+
+api.post('/bikes/addImage/:id', auth, BikeController.attatchImage);// add bike an image url
+
+/*= ================================================================= */
+api.get('/repairs/index', auth, RepairsController.getRepairs);// all recorded rpairs
+
+api.post('/repairs/save', auth, RepairsController.recordRepairs);// new/completed repairs
+
+api.get('/repairs/create', auth, RepairsController.scheduledRepairs);// assign a repair date to a bike
+
+api.get('/repairs/upcoming', auth, RepairsController.upcomingRepairs);// upcoming bike repairs
+
+api.get('/repairs/todays', auth, RepairsController.todaysRepairs);//  current day repairs
 
 /*= ================================================================= */
 api.get('/payments/index', auth, PaymentsController.index);// all recorded payments
@@ -80,7 +80,7 @@ api.post('/payments/save', auth, PaymentsController.recordPayment);// new paymen
 api.get('/payments/stats', auth, PaymentsController.totalPayments); // total daily/weekly/monthly
 
 /*= ================================================================= */
-api.post('/files/upload', UploadController.postUpload);
+api.post('/files/upload', auth, UploadController.postUpload);
 
 /*= ================================================================= */
 

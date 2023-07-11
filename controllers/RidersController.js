@@ -5,7 +5,6 @@ import paginate from '../utils/paginate';
 import Bike from '../models/bikes';
 
 const mongoose = require('mongoose');
-const { getUser } = require('./UsersController');
 const { transactionLogger } = require('../utils/logger');
 
 const { ObjectId } = mongoose.Types;
@@ -13,11 +12,6 @@ const { ObjectId } = mongoose.Types;
 class RidersController {
   // eslint-disable-next-line no-unused-vars
   static async index(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     try {
       const riders = await User.find({ designation: 'rider' });
       // .populate({
@@ -38,11 +32,6 @@ class RidersController {
   }
 
   static async findbyId(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     const riderId = req.params.id;
     try {
       const rider = await User.findOne({ _id: ObjectId(riderId) });
@@ -60,12 +49,6 @@ class RidersController {
   }
 
   static async assignBike(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
     const bikeId = req.query.val_one;
     const userid = req.query.val_two;
 

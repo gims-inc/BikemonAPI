@@ -10,18 +10,12 @@ import transformInput from '../utils/cleanNumberPlate';
 const mongoose = require('mongoose');
 
 const { ObjectId } = mongoose.Types;
-const { getUser } = require('./UsersController');
 const { transactionLogger } = require('../utils/logger');
 
 //  const { authenticate } = require('./AuthController');
 
 class BikeController {
   static async index(req, res) { // paginate -> ToTest
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
 
     const items = await Bike.find();
     const currentPage = parseInt(req.query.page) || 1;
@@ -35,10 +29,6 @@ class BikeController {
   }
 
   static async search(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
     const data = req.query.plate_no;
     const clean = transformInput(data);
     console.log(`Search: ${clean}`);
@@ -57,12 +47,6 @@ class BikeController {
   }
 
   static async newBike(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
     const {
       plate, trackerid, riderid, repairs, description, image,
     } = req.body;
@@ -103,12 +87,7 @@ class BikeController {
   }
 
   static async updateBike(req, res) {
-    const user = await getUser(req);
     // add better logic -only admins can edit-Todo
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     try {
       const { id } = req.body;
       const { plate } = req.body;
@@ -141,11 +120,6 @@ class BikeController {
   }
 
   static async softDelete(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     try {
       const bikeId = req.params.id;
       const bike = await Bike.findById(bikeId);
@@ -162,11 +136,6 @@ class BikeController {
   }
 
   static async attatchImage(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     try {
       const bikeId = req.params.id;
       const bikeImage = req.params.image; // string: link/path to image

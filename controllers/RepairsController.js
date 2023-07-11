@@ -10,16 +10,10 @@ const mongoose = require('mongoose').set('debug', true);
 const moment = require('moment');
 
 const { ObjectId } = mongoose.Types;
-const { getUser } = require('./UsersController');
 const { transactionLogger } = require('../utils/logger');
 
 class RepairsController {
   static async getRepairs(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     try {
       const items = await Repair.find();
       // res.json({ items: repairs }); // paginate -> totest
@@ -38,11 +32,6 @@ class RepairsController {
   }
 
   static async scheduledRepairs(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
     try {
       const bikeId = req.query.id;
       // console.log(`param ->bike: ${bikeId}`); // debug null y!?
@@ -123,10 +112,6 @@ class RepairsController {
   }
 
   static async upcomingRepairs(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
     try {
       const today = moment().format('YYYY-MM-DD');
 
@@ -144,10 +129,6 @@ class RepairsController {
   }
 
   static async todaysRepairs(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
     try {
       // Get today's date in 'YYYY-MM-DD' format
       const today = moment().format('YYYY-MM-DD');
@@ -165,10 +146,6 @@ class RepairsController {
   }
 
   static async recordRepairs(req, res) {
-    const user = await getUser(req);
-    if (!user) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
     const { bikeid, date, description } = req.body;
     try {
       const repairRecord = new Repair({
