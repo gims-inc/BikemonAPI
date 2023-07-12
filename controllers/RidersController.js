@@ -41,6 +41,7 @@ class RidersController {
         return;
       }
 
+      const {_id, userName, email,firstName, lastName, designation} = rider;
       res.status(200).json({ rider: rider });
     } catch (error) {
       console.error(error);

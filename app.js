@@ -8,7 +8,11 @@ server.use(express.json({ limit: '10mb' }));
 
 const apiRoutes = require('./routes/index');
 
-server.use(cors())
+const corsOptions = {
+  origin: process.env.APP_URL
+}
+
+server.use(cors(corsOptions))
 server.use('/api/v1', apiRoutes);
 
 server.listen(port, () => {

@@ -21,6 +21,7 @@ api.use((req, res, next) => {
   const formattedDateTime = moment(timestamp).format('YYYY-MM-DD HH:mm:ss');
   console.log(`Time: ${formattedDateTime} ${req.path} ${req.method}`);
   appLogger.info(`${req.path} ${req.method}`);
+  res.set('Cache-Control', 'no-store'); // disable caching
   next();
 });
 
