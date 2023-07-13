@@ -98,8 +98,7 @@ class UsersController {
       if (!user) {
         return null;
       }
-      const {_id, userName, email,firstName, lastName, designation} = user;
-
+      // const {_id, userName, email,firstName, lastName, designation} = user;
       return user;
     }
     return null;

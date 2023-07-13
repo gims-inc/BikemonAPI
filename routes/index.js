@@ -81,7 +81,9 @@ api.post('/payments/save', auth, PaymentsController.recordPayment);// new paymen
 api.get('/payments/stats', auth, PaymentsController.totalPayments); // total daily/weekly/monthly
 
 /*= ================================================================= */
-api.post('/files/upload', auth, UploadController.postUpload);
+api.post('/folder/new', auth, UploadController.makeDir);
+
+api.post('/files/upload', auth, UploadController.upload);
 
 /*= ================================================================= */
 

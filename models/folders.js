@@ -1,23 +1,17 @@
 const mongoose = require('mongoose');
 
-const FileSchema = new mongoose.Schema({
+const FolderSchema = new mongoose.Schema({
   name: {
     type: String,
     unique: true,
-  },
-  type: {
-    type: String,
-    enum: [ 'image', 'file','doc'],
+    required: true,
   },
   userid: {
     type: String,
   },
   public: {
     type: Boolean,
-    default: false,
-  },
-  folder: {
-    type: String,
+    default: true,
   },
   localpath: {
     type: String,
@@ -32,4 +26,7 @@ const FileSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('File', FileSchema);
+module.exports = mongoose.model('Folder', FolderSchema);
+
+// db.collection.drop()
+// db.collection.distinct()
